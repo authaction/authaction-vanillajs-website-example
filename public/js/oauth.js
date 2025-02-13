@@ -1,9 +1,11 @@
 import * as oauth from "https://cdn.jsdelivr.net/npm/oauth4webapi/+esm";
 
-const AUTHORIZATION_ENDPOINT = "https://your-oauth-provider.com/authorize";
-const TOKEN_ENDPOINT = "https://your-oauth-provider.com/token";
-const CLIENT_ID = "your_client_id";
-const REDIRECT_URI = "http://localhost:5500/callback.html";
+const AUTHORIZATION_ENDPOINT =
+  "https://authaction-sample.eu.authaction.com/oauth2/authorize";
+const TOKEN_ENDPOINT =
+  "https://authaction-sample.eu.authaction.com/oauth2/token";
+const CLIENT_ID = "6O8re2expWfGJoLbTyU5ExRe3thT6KbQ";
+const REDIRECT_URI = "https://main.d8cd3nzbrs41c.amplifyapp.com/callback.html";
 const SCOPES = "openid profile email";
 
 // Store code verifier in sessionStorage (browser-safe)
