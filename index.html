@@ -61,14 +61,6 @@
         return JSON.parse(jsonPayload);
       }
 
-      // Logout function: clear tokens and reload the page to show the login button again.
-      function handleLogout() {
-        sessionStorage.removeItem("id_token");
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("code_verifier");
-        oauth.logout();
-      }
-
       // Check if an ID token exists (set after a successful login in callback.html)
       const idToken = sessionStorage.getItem("id_token");
 
@@ -93,9 +85,9 @@
         );
 
         // Attach the logout handler.
-        document
-          .getElementById("logout")
-          .addEventListener("click", handleLogout);
+        document.getElementById("logout").addEventListener("click", () => {
+          oauth.logout();
+        });
       } else {
         // User is not logged in; show the login button.
         document.getElementById("login").style.display = "block";

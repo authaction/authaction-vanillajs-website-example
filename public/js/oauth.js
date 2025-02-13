@@ -81,14 +81,18 @@ export async function handleCallback() {
 
 // Logout function: Clears tokens and redirects to the logout endpoint
 export function logout() {
+  // Construct the logout URL
+  const logoutUrl = new URL(LOGOUT_ENDPOINT);
+  logoutUrl.searchParams.set("post_logout_redirect_uri", LOGOUT_REDIRECT_URI);
+  logoutUrl.searchParams.set(
+    "id_token_hint",
+    sessionStorage.getItem("id_token")
+  );
+
   // Clear tokens and code verifier from sessionStorage
   sessionStorage.removeItem("id_token");
   sessionStorage.removeItem("access_token");
   sessionStorage.removeItem("code_verifier");
-
-  // Construct the logout URL
-  const logoutUrl = new URL(LOGOUT_ENDPOINT);
-  logoutUrl.searchParams.set("post_logout_redirect_uri", LOGOUT_REDIRECT_URI);
 
   // Redirect the browser to the logout endpoint
   window.location.href = logoutUrl.toString();
