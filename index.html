@@ -8,18 +8,37 @@
       #user-info {
         margin-top: 20px;
       }
+      textarea {
+        width: 800px;
+        height: 250px;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: monospace;
+        font-size: 14px;
+        color: #333;
+        background-color: #f9f9f9;
+        resize: none;
+        overflow: auto;
+      }
+      button {
+        margin-top: 15px;
+      }
     </style>
   </head>
   <body>
     <h1>OAuth2 Login Example</h1>
-    <!-- Login button will be shown only if the user is not logged in -->
+    <!-- Show login button if the user is not logged in -->
     <button id="login" style="display: none">Login with OAuth</button>
 
-    <!-- Container for displaying logged in user info -->
+    <!-- Container for displaying logged in user info and logout button -->
     <div id="user-info" style="display: none">
-      <h2>Logged In User Info</h2>
-      <p id="user-name"></p>
-      <p id="user-email"></p>
+      <p id="welcome"></p>
+      <div>
+        <textarea id="decoded-token" readonly></textarea>
+      </div>
+      <button id="logout">Logout</button>
     </div>
 
     <script type="module">
@@ -36,29 +55,49 @@
         const jsonPayload = decodeURIComponent(
           atob(base64)
             .split("")
-            .map((c) => {
-              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
+            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
             .join("")
         );
         return JSON.parse(jsonPayload);
+      }
+
+      // Logout function: clear tokens and reload the page to show the login button again.
+      function handleLogout() {
+        sessionStorage.removeItem("id_token");
+        sessionStorage.removeItem("access_token");
+        sessionStorage.removeItem("code_verifier");
+        oauth.logout();
       }
 
       // Check if an ID token exists (set after a successful login in callback.html)
       const idToken = sessionStorage.getItem("id_token");
 
       if (idToken) {
-        // Decode the token to extract user information
-        const userData = parseJwt(idToken);
+        // User is logged in; decode token to extract user info.
+        const decoded = parseJwt(idToken);
 
-        // Display user info; adjust property names based on your token claims
+        // Show the user info container and hide the login button.
         document.getElementById("user-info").style.display = "block";
-        document.getElementById("user-name").textContent =
-          "Name: " + (userData.name || userData.preferred_username || "N/A");
-        document.getElementById("user-email").textContent =
-          "Email: " + (userData.email || "N/A");
+
+        // Display a welcome message (using either 'name' or 'profile.name' from the token).
+        const welcomeMessage =
+          decoded.name || (decoded.profile && decoded.profile.name) || "User";
+        document.getElementById("welcome").textContent =
+          "Welcome, " + welcomeMessage;
+
+        // Display the full decoded token in the textarea (pretty-printed JSON).
+        document.getElementById("decoded-token").value = JSON.stringify(
+          decoded,
+          null,
+          2
+        );
+
+        // Attach the logout handler.
+        document
+          .getElementById("logout")
+          .addEventListener("click", handleLogout);
       } else {
-        // If the user is not logged in, show the login button
+        // User is not logged in; show the login button.
         document.getElementById("login").style.display = "block";
         document.getElementById("login").addEventListener("click", () => {
           oauth.login();

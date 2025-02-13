@@ -4,8 +4,11 @@ const AUTHORIZATION_ENDPOINT =
   "https://authaction-sample.eu.authaction.com/oauth2/authorize";
 const TOKEN_ENDPOINT =
   "https://authaction-sample.eu.authaction.com/oauth2/token";
+const LOGOUT_ENDPOINT =
+  "https://authaction-sample.eu.authaction.com/oauth2/logout";
 const CLIENT_ID = "6O8re2expWfGJoLbTyU5ExRe3thT6KbQ";
 const REDIRECT_URI = "https://main.d8cd3nzbrs41c.amplifyapp.com/callback.html";
+const LOGOUT_REDIRECT_URI = "https://main.d8cd3nzbrs41c.amplifyapp.com";
 const SCOPES = "openid profile email";
 
 // Store code verifier in sessionStorage (browser-safe)
@@ -68,10 +71,25 @@ export async function handleCallback() {
   console.log("Access Token:", tokens.access_token);
   console.log("ID Token:", tokens.id_token);
 
-  // Store token in sessionStorage (or localStorage)
+  // Store tokens in sessionStorage (or localStorage)
   sessionStorage.setItem("id_token", tokens.id_token);
   sessionStorage.setItem("access_token", tokens.access_token);
 
   // Redirect to home page or protected area
   window.location.href = "index.html";
+}
+
+// Logout function: Clears tokens and redirects to the logout endpoint
+export function logout() {
+  // Clear tokens and code verifier from sessionStorage
+  sessionStorage.removeItem("id_token");
+  sessionStorage.removeItem("access_token");
+  sessionStorage.removeItem("code_verifier");
+
+  // Construct the logout URL
+  const logoutUrl = new URL(LOGOUT_ENDPOINT);
+  logoutUrl.searchParams.set("post_logout_redirect_uri", LOGOUT_REDIRECT_URI);
+
+  // Redirect the browser to the logout endpoint
+  window.location.href = logoutUrl.toString();
 }
