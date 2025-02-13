@@ -69,6 +69,7 @@ export async function handleCallback() {
   console.log("ID Token:", tokens.id_token);
 
   // Store token in sessionStorage (or localStorage)
+  sessionStorage.setItem("id_token", tokens.id_token);
   sessionStorage.setItem("access_token", tokens.access_token);
 
   // Redirect to home page or protected area

@@ -4,17 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OAuth2 Login</title>
+    <style>
+      #user-info {
+        margin-top: 20px;
+      }
+    </style>
   </head>
   <body>
     <h1>OAuth2 Login Example</h1>
-    <button id="login">Login with OAuth</button>
+    <!-- Login button will be shown only if the user is not logged in -->
+    <button id="login" style="display: none">Login with OAuth</button>
+
+    <!-- Container for displaying logged in user info -->
+    <div id="user-info" style="display: none">
+      <h2>Logged In User Info</h2>
+      <p id="user-name"></p>
+      <p id="user-email"></p>
+    </div>
 
     <script type="module">
       import * as oauth from "./public/js/oauth.js";
 
-      document.getElementById("login").addEventListener("click", () => {
-        oauth.login();
-      });
+      /**
+       * Decodes a JWT token and returns its payload as a JavaScript object.
+       * @param {string} token - The JWT token.
+       * @returns {object} The decoded payload.
+       */
+      function parseJwt(token) {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map((c) => {
+              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+        );
+        return JSON.parse(jsonPayload);
+      }
+
+      // Check if an ID token exists (set after a successful login in callback.html)
+      const idToken = sessionStorage.getItem("id_token");
+
+      if (idToken) {
+        // Decode the token to extract user information
+        const userData = parseJwt(idToken);
+
+        // Display user info; adjust property names based on your token claims
+        document.getElementById("user-info").style.display = "block";
+        document.getElementById("user-name").textContent =
+          "Name: " + (userData.name || userData.preferred_username || "N/A");
+        document.getElementById("user-email").textContent =
+          "Email: " + (userData.email || "N/A");
+      } else {
+        // If the user is not logged in, show the login button
+        document.getElementById("login").style.display = "block";
+        document.getElementById("login").addEventListener("click", () => {
+          oauth.login();
+        });
+      }
     </script>
   </body>
 </html>
