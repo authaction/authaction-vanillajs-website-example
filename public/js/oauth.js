@@ -1,14 +1,12 @@
 import * as oauth from "https://cdn.jsdelivr.net/npm/oauth4webapi/+esm";
 
-const AUTHORIZATION_ENDPOINT =
-  "https://authaction-sample.eu.authaction.com/oauth2/authorize";
-const TOKEN_ENDPOINT =
-  "https://authaction-sample.eu.authaction.com/oauth2/token";
-const LOGOUT_ENDPOINT =
-  "https://authaction-sample.eu.authaction.com/oauth2/logout";
-const CLIENT_ID = "6O8re2expWfGJoLbTyU5ExRe3thT6KbQ";
-const REDIRECT_URI = "https://main.d8cd3nzbrs41c.amplifyapp.com/callback.html";
-const LOGOUT_REDIRECT_URI = "https://main.d8cd3nzbrs41c.amplifyapp.com";
+const AUTHORIZATION_ENDPOINT = import.meta.env
+  .VITE_AUTHACTION_AUTHORIZATION_ENDPOINT;
+const TOKEN_ENDPOINT = import.meta.env.VITE_AUTHACTION_TOKEN_ENDPOINT;
+const LOGOUT_ENDPOINT = import.meta.env.VITE_AUTHACTION_LOGOUT_ENDPOINT;
+const CLIENT_ID = import.meta.env.VITE_AUTHACTION_CLIENT_ID;
+const REDIRECT_URI = import.meta.env.VITE_AUTHACTION_REDIRECT_URI;
+const LOGOUT_REDIRECT_URI = import.meta.env.VITE_AUTHACTION_LOGOUT_REDIRECT_URI;
 const SCOPES = "openid profile email";
 
 // Store code verifier in sessionStorage (browser-safe)
