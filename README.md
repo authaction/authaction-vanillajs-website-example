@@ -1,6 +1,6 @@
 # OAuth2 Integration with AuthAction (Vanilla JavaScript)
 
-This is a Vanilla JavaScript application demonstrating how to integrate OAuth2 authentication using [AuthAction](https://app.authaction.com/) with the `oauth4webapi` library.
+This is a Vanilla JavaScript application demonstrating how to integrate OAuth2 authentication using [AuthAction](https://authaction.com/) with the `oauth4webapi` library.
 
 ## Overview
 
