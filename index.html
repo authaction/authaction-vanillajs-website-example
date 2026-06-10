@@ -95,11 +95,12 @@
 
       if (idToken) {
         const user = parseJwt(idToken);
+        const { access_token, profile, ...displayClaims } = user;
 
         document.getElementById('avatar').textContent = initials(user.name);
         document.getElementById('user-name').textContent = user.name ?? '';
         document.getElementById('user-email').textContent = user.email ?? '';
-        document.getElementById('raw-claims-pre').textContent = JSON.stringify(user, null, 2);
+        document.getElementById('raw-claims-pre').textContent = JSON.stringify(displayClaims, null, 2);
         document.getElementById('auth-state').style.display = 'block';
 
         document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
