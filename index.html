@@ -3,97 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OAuth2 Login</title>
-    <style>
-      #user-info {
-        margin-top: 20px;
-      }
-      textarea {
-        width: 800px;
-        height: 250px;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        font-family: monospace;
-        font-size: 14px;
-        color: #333;
-        background-color: #f9f9f9;
-        resize: none;
-        overflow: auto;
-      }
-      button {
-        margin-top: 15px;
-      }
-    </style>
+    <title>AuthAction — VanillaJS Example</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <h1>AuthAction Vanilla js OAuth2 Login Example</h1>
-    <!-- Show login button if the user is not logged in -->
-    <button id="login" style="display: none">Login with OAuth</button>
+    <div class="page">
+      <div class="card">
 
-    <!-- Container for displaying logged in user info and logout button -->
-    <div id="user-info" style="display: none">
-      <p id="welcome"></p>
-      <div>
-        <textarea id="decoded-token" readonly></textarea>
+        <!-- Header -->
+        <div class="card-header">
+          <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="6" fill="#6366f1"/>
+              <path d="M7 17L12 7L17 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 13H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="brand-name">AuthAction</span>
+          </div>
+          <span class="badge">VanillaJS</span>
+        </div>
+
+        <!-- Loading (shown briefly before JS runs) -->
+        <div id="loading-state" class="state-body">
+          <div class="spinner"></div>
+          <p class="state-hint">Loading…</p>
+        </div>
+
+        <!-- Logged-out state -->
+        <div id="login-state" style="display:none">
+          <div class="state-body">
+            <div class="lock-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.75"/>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="state-title">Welcome back</p>
+            <p class="state-hint">Sign in to your account to continue</p>
+          </div>
+          <div class="card-footer">
+            <button id="login-btn" class="btn btn-primary">Sign in with AuthAction</button>
+          </div>
+        </div>
+
+        <!-- Logged-in state -->
+        <div id="auth-state" style="display:none">
+          <div class="state-body">
+            <div class="avatar" id="avatar"></div>
+            <div class="user-info">
+              <p class="user-name" id="user-name"></p>
+              <p class="user-email" id="user-email"></p>
+            </div>
+            <div class="status-pill">
+              <span class="status-dot"></span>
+              Authenticated
+            </div>
+            <details class="raw-claims" id="raw-claims">
+              <summary>Raw claims</summary>
+              <pre id="raw-claims-pre"></pre>
+            </details>
+          </div>
+          <div class="card-footer">
+            <button id="logout-btn" class="btn btn-secondary">Sign out</button>
+          </div>
+        </div>
+
       </div>
-      <button id="logout">Logout</button>
+
+      <p class="footer-note">
+        Secured by <a href="https://authaction.com" target="_blank" rel="noopener">AuthAction</a>
+      </p>
     </div>
 
     <script type="module">
-      import * as oauth from "./src/oauth.js";
+      import * as oauth from './src/oauth.js';
 
-      /**
-       * Decodes a JWT token and returns its payload as a JavaScript object.
-       * @param {string} token - The JWT token.
-       * @returns {object} The decoded payload.
-       */
-      function parseJwt(token) {
-        const base64Url = token.split(".")[1];
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split("")
-            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-            .join("")
-        );
-        return JSON.parse(jsonPayload);
+      function initials(name) {
+        if (!name) return '?';
+        return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('');
       }
 
-      // Check if an ID token exists (set after a successful login in callback.html)
-      const idToken = sessionStorage.getItem("id_token");
+      function parseJwt(token) {
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+      }
+
+      const idToken = sessionStorage.getItem('id_token');
+
+      document.getElementById('loading-state').style.display = 'none';
 
       if (idToken) {
-        // User is logged in; decode token to extract user info.
-        const decoded = parseJwt(idToken);
+        const user = parseJwt(idToken);
 
-        // Show the user info container and hide the login button.
-        document.getElementById("user-info").style.display = "block";
+        document.getElementById('avatar').textContent = initials(user.name);
+        document.getElementById('user-name').textContent = user.name ?? '';
+        document.getElementById('user-email').textContent = user.email ?? '';
+        document.getElementById('raw-claims-pre').textContent = JSON.stringify(user, null, 2);
+        document.getElementById('auth-state').style.display = 'block';
 
-        // Display a welcome message (using either 'name' or 'profile.name' from the token).
-        const welcomeMessage =
-          decoded.name || (decoded.profile && decoded.profile.name) || "User";
-        document.getElementById("welcome").textContent =
-          "Welcome, " + welcomeMessage;
-
-        // Display the full decoded token in the textarea (pretty-printed JSON).
-        document.getElementById("decoded-token").value = JSON.stringify(
-          decoded,
-          null,
-          2
-        );
-
-        // Attach the logout handler.
-        document.getElementById("logout").addEventListener("click", () => {
-          oauth.logout();
-        });
+        document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
       } else {
-        // User is not logged in; show the login button.
-        document.getElementById("login").style.display = "block";
-        document.getElementById("login").addEventListener("click", () => {
-          oauth.login();
-        });
+        document.getElementById('login-state').style.display = 'block';
+        document.getElementById('login-btn').addEventListener('click', () => oauth.login());
       }
     </script>
   </body>

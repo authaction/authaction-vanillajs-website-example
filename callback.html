@@ -3,13 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OAuth2 Callback</title>
+    <title>AuthAction — Signing in…</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <h1>Processing OAuth2 Callback...</h1>
+    <div class="page">
+      <div class="card">
+
+        <!-- Header -->
+        <div class="card-header">
+          <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="6" fill="#6366f1"/>
+              <path d="M7 17L12 7L17 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 13H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="brand-name">AuthAction</span>
+          </div>
+          <span class="badge">VanillaJS</span>
+        </div>
+
+        <div class="state-body">
+          <div class="spinner"></div>
+          <p class="state-hint">Completing sign-in…</p>
+        </div>
+
+      </div>
+
+      <p class="footer-note">
+        Secured by <a href="https://authaction.com" target="_blank" rel="noopener">AuthAction</a>
+      </p>
+    </div>
 
     <script type="module">
-      import * as oauth from "./src/oauth.js";
+      import * as oauth from './src/oauth.js';
       oauth.handleCallback();
     </script>
   </body>
