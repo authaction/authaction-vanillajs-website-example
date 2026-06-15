@@ -7,106 +7,65 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div class="page">
-      <div class="card">
 
-        <!-- Header -->
-        <div class="card-header">
-          <div class="brand">
-            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="24" height="24" rx="6" fill="#6366f1"/>
-              <path d="M7 17L12 7L17 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9 13H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="brand-name">AuthAction</span>
-          </div>
+    <div id="app" style="display:none">
+
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="6" fill="#6366f1"/>
+            <path d="M7 17L12 7L17 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 13H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="navbar-title">AuthAction</span>
+        </div>
+        <div class="navbar-actions">
+          <span class="demo-badge">Demo App</span>
           <span class="badge">VanillaJS</span>
+          <button id="login-nav-btn" class="btn btn-ghost">Log in</button>
+          <button id="signup-nav-btn" class="btn btn-primary btn-sm">Sign up</button>
         </div>
+      </nav>
 
-        <!-- Loading (shown briefly before JS runs) -->
-        <div id="loading-state" class="state-body">
-          <div class="spinner"></div>
-          <p class="state-hint">Loading…</p>
+      <!-- Hero -->
+      <main class="hero">
+        <p class="hero-eyebrow">Identity &amp; Access Management</p>
+        <h1 class="hero-title">Authentication made simple</h1>
+        <p class="hero-subtitle">
+          Secure, fast, and developer-friendly OAuth2 authentication for your applications.
+        </p>
+        <div class="hero-actions">
+          <button id="signup-hero-btn" class="btn btn-primary btn-lg">Get started free</button>
+          <button id="login-hero-btn" class="btn btn-outline btn-lg">Log in</button>
         </div>
+      </main>
 
-        <!-- Logged-out state -->
-        <div id="login-state" style="display:none">
-          <div class="state-body">
-            <div class="lock-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.75"/>
-                <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <p class="state-title">Welcome back</p>
-            <p class="state-hint">Sign in to your account to continue</p>
-          </div>
-          <div class="card-footer">
-            <button id="login-btn" class="btn btn-primary">Sign in with AuthAction</button>
-          </div>
-        </div>
+    </div>
 
-        <!-- Logged-in state -->
-        <div id="auth-state" style="display:none">
-          <div class="state-body">
-            <div class="avatar" id="avatar"></div>
-            <div class="user-info">
-              <p class="user-name" id="user-name"></p>
-              <p class="user-email" id="user-email"></p>
-            </div>
-            <div class="status-pill">
-              <span class="status-dot"></span>
-              Authenticated
-            </div>
-            <details class="raw-claims" id="raw-claims">
-              <summary>Raw claims</summary>
-              <pre id="raw-claims-pre"></pre>
-            </details>
-          </div>
-          <div class="card-footer">
-            <button id="logout-btn" class="btn btn-secondary">Sign out</button>
-          </div>
-        </div>
-
-      </div>
-
-      <p class="footer-note">
-        Secured by <a href="https://authaction.com" target="_blank" rel="noopener">AuthAction</a>
-      </p>
+    <!-- Loading spinner (shown until JS resolves session) -->
+    <div id="loading-state" class="screen-center">
+      <div class="spinner"></div>
     </div>
 
     <script type="module">
       import * as oauth from './src/oauth.js';
 
-      function initials(name) {
-        if (!name) return '?';
-        return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-      }
-
-      function parseJwt(token) {
-        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-      }
-
       const idToken = sessionStorage.getItem('id_token');
 
-      document.getElementById('loading-state').style.display = 'none';
-
       if (idToken) {
-        const user = parseJwt(idToken);
-        const { access_token, profile, ...displayClaims } = user;
-
-        document.getElementById('avatar').textContent = initials(user.name);
-        document.getElementById('user-name').textContent = user.name ?? '';
-        document.getElementById('user-email').textContent = user.email ?? '';
-        document.getElementById('raw-claims-pre').textContent = JSON.stringify(displayClaims, null, 2);
-        document.getElementById('auth-state').style.display = 'block';
-
-        document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
+        // Already authenticated — redirect to claims page
+        window.location.replace('claims.html');
       } else {
-        document.getElementById('login-state').style.display = 'block';
-        document.getElementById('login-btn').addEventListener('click', () => oauth.login());
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        document.getElementById('app').style.flexDirection = 'column';
+        document.getElementById('app').style.minHeight = '100vh';
+
+        document.getElementById('login-nav-btn').addEventListener('click', () => oauth.login());
+        document.getElementById('login-hero-btn').addEventListener('click', () => oauth.login());
+        document.getElementById('signup-nav-btn').addEventListener('click', () => oauth.signup());
+        document.getElementById('signup-hero-btn').addEventListener('click', () => oauth.signup());
       }
     </script>
   </body>

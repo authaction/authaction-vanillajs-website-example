@@ -9,18 +9,15 @@ const REDIRECT_URI = import.meta.env.VITE_AUTHACTION_REDIRECT_URI;
 const LOGOUT_REDIRECT_URI = import.meta.env.VITE_AUTHACTION_LOGOUT_REDIRECT_URI;
 const SCOPES = "openid profile email";
 
-// Store code verifier in sessionStorage (browser-safe)
 function saveCodeVerifier(codeVerifier) {
   sessionStorage.setItem("code_verifier", codeVerifier);
 }
 
-// Retrieve the stored code verifier
 function getCodeVerifier() {
   return sessionStorage.getItem("code_verifier");
 }
 
-// Step 1: Start OAuth2 login
-export async function login() {
+async function buildAuthUrl(extraParams = {}) {
   const codeVerifier = oauth.generateRandomCodeVerifier();
   const codeChallenge = await oauth.calculatePKCECodeChallenge(codeVerifier);
   saveCodeVerifier(codeVerifier);
@@ -32,11 +29,20 @@ export async function login() {
   authUrl.searchParams.set("scope", SCOPES);
   authUrl.searchParams.set("code_challenge", codeChallenge);
   authUrl.searchParams.set("code_challenge_method", "S256");
-
-  window.location.href = authUrl.toString();
+  for (const [key, value] of Object.entries(extraParams)) {
+    authUrl.searchParams.set(key, value);
+  }
+  return authUrl.toString();
 }
 
-// Step 2: Handle OAuth2 callback
+export async function login() {
+  window.location.href = await buildAuthUrl();
+}
+
+export async function signup() {
+  window.location.href = await buildAuthUrl({ screen_hint: "signup" });
+}
+
 export async function handleCallback() {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code");
@@ -52,7 +58,6 @@ export async function handleCallback() {
     return;
   }
 
-  // Exchange authorization code for an access token
   const response = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -66,20 +71,14 @@ export async function handleCallback() {
   });
 
   const tokens = await response.json();
-  console.log("Access Token:", tokens.access_token);
-  console.log("ID Token:", tokens.id_token);
 
-  // Store tokens in sessionStorage (or localStorage)
   sessionStorage.setItem("id_token", tokens.id_token);
   sessionStorage.setItem("access_token", tokens.access_token);
 
-  // Redirect to home page or protected area
-  window.location.href = "index.html";
+  window.location.href = "claims.html";
 }
 
-// Logout function: Clears tokens and redirects to the logout endpoint
 export function logout() {
-  // Construct the logout URL
   const logoutUrl = new URL(LOGOUT_ENDPOINT);
   logoutUrl.searchParams.set("post_logout_redirect_uri", LOGOUT_REDIRECT_URI);
   logoutUrl.searchParams.set(
@@ -87,11 +86,9 @@ export function logout() {
     sessionStorage.getItem("id_token")
   );
 
-  // Clear tokens and code verifier from sessionStorage
   sessionStorage.removeItem("id_token");
   sessionStorage.removeItem("access_token");
   sessionStorage.removeItem("code_verifier");
 
-  // Redirect the browser to the logout endpoint
   window.location.href = logoutUrl.toString();
 }

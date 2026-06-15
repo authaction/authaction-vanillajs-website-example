@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AuthAction — Raw Claims</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+
+    <!-- Loading spinner (shown until JS resolves session) -->
+    <div id="loading-state" class="screen-center">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="app" style="display:none; flex-direction:column; min-height:100vh">
+
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="6" fill="#6366f1"/>
+            <path d="M7 17L12 7L17 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 13H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="navbar-title">AuthAction</span>
+        </div>
+        <div class="navbar-actions">
+          <span class="demo-badge">Demo App</span>
+          <span class="badge">VanillaJS</span>
+          <div class="avatar-sm" id="avatar-sm"></div>
+          <button id="logout-btn" class="btn btn-ghost">Sign out</button>
+        </div>
+      </nav>
+
+      <!-- Claims -->
+      <main class="claims-main">
+        <div class="claims-card">
+          <h1 class="claims-title">Raw Claims</h1>
+          <pre class="claims-content" id="claims-pre"></pre>
+        </div>
+      </main>
+
+    </div>
+
+    <script type="module">
+      import * as oauth from './src/oauth.js';
+
+      function parseJwt(token) {
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+      }
+
+      const idToken = sessionStorage.getItem('id_token');
+
+      if (!idToken) {
+        window.location.replace('index.html');
+      } else {
+        const user = parseJwt(idToken);
+        const { access_token, profile, ...claims } = user;
+
+        document.getElementById('avatar-sm').textContent =
+          user.name?.[0]?.toUpperCase() ?? 'U';
+        document.getElementById('claims-pre').textContent =
+          JSON.stringify(claims, null, 2);
+
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+
+        document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
+      }
+    </script>
+  </body>
+</html>
