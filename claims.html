@@ -55,7 +55,7 @@
       const idToken = sessionStorage.getItem('id_token');
 
       if (!idToken) {
-        window.location.replace('index.html');
+        window.location.replace('/');
       } else {
         const user = parseJwt(idToken);
         const { access_token, profile, ...claims } = user;

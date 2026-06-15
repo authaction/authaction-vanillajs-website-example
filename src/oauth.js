@@ -75,7 +75,7 @@ export async function handleCallback() {
   sessionStorage.setItem("id_token", tokens.id_token);
   sessionStorage.setItem("access_token", tokens.access_token);
 
-  window.location.href = "claims.html";
+  window.location.href = "/claims.html";
 }
 
 export function logout() {

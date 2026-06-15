@@ -6,6 +6,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         callback: "callback.html",
+        claims: "claims.html",
       },
     },
   },
