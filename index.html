@@ -51,10 +51,9 @@
     <script type="module">
       import * as oauth from './src/oauth.js';
 
-      const idToken = sessionStorage.getItem('id_token');
+      const isAuthenticated = await oauth.client.isAuthenticated();
 
-      if (idToken) {
-        // Already authenticated — redirect to claims page
+      if (isAuthenticated) {
         window.location.replace('/claims.html');
       } else {
         document.getElementById('loading-state').style.display = 'none';

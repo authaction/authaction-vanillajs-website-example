@@ -46,18 +46,11 @@
     <script type="module">
       import * as oauth from './src/oauth.js';
 
-      function parseJwt(token) {
-        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-      }
+      const user = await oauth.client.getUser();
 
-      const idToken = sessionStorage.getItem('id_token');
-
-      if (!idToken) {
+      if (!user) {
         window.location.replace('/');
       } else {
-        const user = parseJwt(idToken);
         const { access_token, profile, ...claims } = user;
 
         document.getElementById('avatar-sm').textContent =

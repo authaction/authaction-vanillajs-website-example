@@ -11,6 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@authaction/web-sdk": "^0.1.7"
+  },
   "devDependencies": {
     "vite": "^6.1.1"
   }
