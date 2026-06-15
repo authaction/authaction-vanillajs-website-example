@@ -18,7 +18,7 @@ export async function signup() {
 
 export async function handleCallback() {
   await client.handleRedirectCallback();
-  window.location.href = "/claims.html";
+  window.location.href = "/claims";
 }
 
 export async function logout() {

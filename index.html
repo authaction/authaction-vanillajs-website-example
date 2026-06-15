@@ -55,7 +55,7 @@
         const isAuthenticated = await oauth.client.isAuthenticated();
 
         if (isAuthenticated) {
-          window.location.replace('/claims.html');
+          window.location.replace('/claims');
         } else {
           document.getElementById('loading-state').style.display = 'none';
           document.getElementById('app').style.display = 'flex';
