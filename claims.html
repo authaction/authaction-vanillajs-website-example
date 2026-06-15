@@ -46,23 +46,25 @@
     <script type="module">
       import * as oauth from './src/oauth.js';
 
-      const user = await oauth.client.getUser();
+      (async () => {
+        const user = await oauth.client.getUser();
 
-      if (!user) {
-        window.location.replace('/');
-      } else {
-        const { access_token, profile, ...claims } = user;
+        if (!user) {
+          window.location.replace('/');
+        } else {
+          const { access_token, profile, ...claims } = user;
 
-        document.getElementById('avatar-sm').textContent =
-          user.name?.[0]?.toUpperCase() ?? 'U';
-        document.getElementById('claims-pre').textContent =
-          JSON.stringify(claims, null, 2);
+          document.getElementById('avatar-sm').textContent =
+            user.name?.[0]?.toUpperCase() ?? 'U';
+          document.getElementById('claims-pre').textContent =
+            JSON.stringify(claims, null, 2);
 
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
+          document.getElementById('loading-state').style.display = 'none';
+          document.getElementById('app').style.display = 'flex';
 
-        document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
-      }
+          document.getElementById('logout-btn').addEventListener('click', () => oauth.logout());
+        }
+      })();
     </script>
   </body>
 </html>

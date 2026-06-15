@@ -51,21 +51,23 @@
     <script type="module">
       import * as oauth from './src/oauth.js';
 
-      const isAuthenticated = await oauth.client.isAuthenticated();
+      (async () => {
+        const isAuthenticated = await oauth.client.isAuthenticated();
 
-      if (isAuthenticated) {
-        window.location.replace('/claims.html');
-      } else {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        document.getElementById('app').style.flexDirection = 'column';
-        document.getElementById('app').style.minHeight = '100vh';
+        if (isAuthenticated) {
+          window.location.replace('/claims.html');
+        } else {
+          document.getElementById('loading-state').style.display = 'none';
+          document.getElementById('app').style.display = 'flex';
+          document.getElementById('app').style.flexDirection = 'column';
+          document.getElementById('app').style.minHeight = '100vh';
 
-        document.getElementById('login-nav-btn').addEventListener('click', () => oauth.login());
-        document.getElementById('login-hero-btn').addEventListener('click', () => oauth.login());
-        document.getElementById('signup-nav-btn').addEventListener('click', () => oauth.signup());
-        document.getElementById('signup-hero-btn').addEventListener('click', () => oauth.signup());
-      }
+          document.getElementById('login-nav-btn').addEventListener('click', () => oauth.login());
+          document.getElementById('login-hero-btn').addEventListener('click', () => oauth.login());
+          document.getElementById('signup-nav-btn').addEventListener('click', () => oauth.signup());
+          document.getElementById('signup-hero-btn').addEventListener('click', () => oauth.signup());
+        }
+      })();
     </script>
   </body>
 </html>
